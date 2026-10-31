@@ -1,0 +1,85 @@
+/* A readable setting behind a stable, close portrait. */
+#scene { transition: filter .35s ease; }
+#game.is-story #scene {
+  filter: saturate(.66) brightness(.89) contrast(.94);
+  transform: none;
+}
+#game.is-story > .shade {
+  background: linear-gradient(180deg, #17323c12, #edf0e20d 48%, #17323c38) !important;
+}
+#game.is-story #story { display: block; }
+#game.is-story #sceneLabel {
+  top: 94px; left: 4%; z-index: 2;
+  font-size: 11px; padding: 8px 13px;
+  background: #23414bd9;
+}
+#game.is-story #cast {
+  position: absolute; inset: 88px 0 22px;
+  display: block; overflow: hidden; pointer-events: none;
+}
+#game.is-story #cast .portrait {
+  position: absolute; inset: 0;
+  animation: portrait-in .22s ease-out;
+}
+#game.is-story #cast .portrait img {
+  position: absolute; top: 0; left: 50%;
+  /* Size follows the viewport, never the number of lines or choices. */
+  height: calc((100dvh - 100px) * 2.2);
+  min-height: 880px; width: auto; max-width: none;
+  object-fit: contain; transform: translateX(-50%);
+  filter: drop-shadow(0 8px 18px #172b3928);
+}
+@keyframes portrait-in { from { opacity: .4; } to { opacity: 1; } }
+#game.is-story #dialogue {
+  position: absolute; left: 4%; right: 4%; bottom: 22px;
+  width: auto; max-width: 1320px; margin: 0 auto;
+  padding: 19px 30px 16px; min-height: 150px; max-height: 42dvh;
+  overflow-y: auto; z-index: 3;
+  background: #fff8eaf7; border-radius: 4px;
+  box-shadow: 0 8px 32px #17364235;
+}
+#game.is-story #line { margin: 11px 0 7px; line-height: 1.75; }
+#game.is-story #choices { gap: 10px; }
+#game.is-story #choices button { min-width: 0; padding: 12px 17px; line-height: 1.5; }
+#game.is-story #next { min-height: 32px; padding-top: 5px; }
+#walker { bottom: 20.6%; }
+.audio-settings { display: grid; gap: 20px; padding-top: 6px; }
+.audio-settings p { margin: 0; font-size: 13px; color: #637875; }
+.audio-settings .audio-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }
+.audio-settings label { font-size: 15px; }
+.audio-settings output { font-size: 13px; color: #637875; }
+.audio-settings input[type=range] { grid-column: 1 / -1; width: 100%; accent-color: #365e63; cursor: pointer; }
+.audio-settings button { color: #294754; background: #f2ead9; border: 1px solid #cdb78e; border-radius: 4px; padding: 11px 16px; }
+.audio-settings .audio-mute[aria-pressed=true] { background: #294754; color: #fff8ea; }
+@media (max-width: 700px) {
+  header { padding: 17px 4%; gap: 8px; }
+  .tools { gap: 5px; }
+  .tools button { padding: 7px 8px; }
+  #game.is-story #sceneLabel { top: 70px; font-size: 10px; padding: 6px 10px; }
+  #game.is-story #cast { top: 94px; bottom: 14px; }
+  #game.is-story #cast .portrait img { height: calc((100dvh - 100px) * 2.2); min-height: 850px; }
+  #game.is-story #dialogue { left: 3%; right: 3%; bottom: 14px; padding: 16px 20px 13px; min-height: 142px; }
+  #game.is-story #speaker { font-size: 15px; }
+  #game.is-story #line { font-size: 17px; }
+  #game.is-story #choices button { flex: 1 1 0; font-size: 13px; padding: 11px 12px; }
+}
+@media (max-width: 420px) {
+  #brand { font-size: 12px; }
+  #game.is-story #cast .portrait img { height: min(calc((100dvh - 100px) * 2.2), 320vw); }
+  .tools button { font-size: 10px; padding: 7px 6px; }
+  #game.is-story #dialogue { padding: 14px 17px 11px; }
+  #game.is-story #line { font-size: 16px; }
+  #game.is-story #choices button { padding: 10px; }
+}
+@media (max-height: 540px) and (min-width: 701px) {
+  #game { min-height: 360px; }
+  header { padding-top: 15px; padding-bottom: 15px; }
+  #game.is-story #sceneLabel { top: 65px; }
+  #game.is-story #cast { top: 60px; bottom: 10px; }
+  #game.is-story #cast .portrait img { min-height: 0; height: calc((100dvh - 60px) * 2.3); }
+  #game.is-story #dialogue { bottom: 10px; min-height: 120px; padding: 12px 23px; }
+  #game.is-story #line { font-size: 16px; margin: 7px 0 2px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #scene, #game.is-story #cast .portrait { transition: none; animation: none; }
+}

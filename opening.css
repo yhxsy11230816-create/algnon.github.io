@@ -1,0 +1,78 @@
+/* Opening film and the separate street sprite. Dialogue portraits stay unchanged. */
+#openingBackdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: #424b85 url('assets/opening-final-frame.png') center / cover no-repeat;
+}
+#openingVideo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+#openingBackdrop.video-unavailable #openingVideo { opacity: 0; }
+#game > .shade { z-index: 1; }
+#game.is-intro > .shade {
+  background: linear-gradient(90deg, rgba(27, 31, 58, .62), rgba(32, 32, 64, .16) 65%, transparent) !important;
+}
+#intro, #street, #story { z-index: 2; }
+#game.is-intro header { background: linear-gradient(#1b244f55, transparent); }
+#game.is-intro #intro .eyebrow { animation: opening-type-in .9s .2s both; }
+#game.is-intro #intro h1 { animation: opening-type-in 1.15s .5s both; }
+#game.is-intro #intro > p { animation: opening-type-in .95s .9s both; }
+#game.is-intro #startBtn { animation: opening-type-in .8s 1.2s both; }
+#game.is-intro .intro-note { animation: opening-type-in .8s 1.4s both; }
+#game.is-intro #intro h1 { text-shadow: 0 3px 24px #20233b30; }
+#game.is-intro #intro > p { color: #fff4e3e0; }
+#openingControls {
+  position: absolute;
+  bottom: 30px;
+  right: 4%;
+  z-index: 11;
+  display: flex;
+  gap: 8px;
+}
+#openingControls button {
+  padding: 9px 14px;
+  border: 1px solid #fff5;
+  border-radius: 24px;
+  background: #292b4b85;
+  color: #fff6e6;
+  font-size: 12px;
+  backdrop-filter: blur(8px);
+}
+#openingControls button:hover { background: #36375bbf; }
+#game::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  background: #172d36;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .4s ease;
+}
+#game.opening-leaving::after { opacity: 1; }
+#game.opening-leaving { pointer-events: none; }
+#walker { height: 34%; bottom: 21.8%; transform-origin: center; }
+/* Keep destination labels above the sprite rather than across its face. */
+.door { top: calc(47% - 66px); }
+@keyframes opening-type-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 700px) {
+  #openingControls { bottom: 16px; right: 5%; }
+  #openingControls button { font-size: 10px; padding: 8px 11px; }
+  #game.is-intro #intro { top: clamp(100px, 19vh, 180px); }
+  #game.is-intro h1 { font-size: clamp(36px, 7.5vh, 49px); margin: 16px 0; }
+  #game.is-intro #intro > p { margin-bottom: 18px; }
+  #game.is-intro .intro-note { margin-top: 15px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #game.is-intro #intro > *, #game.is-intro #startBtn { animation: none; }
+  #game::after { transition: none; }
+}
