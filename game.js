@@ -6,7 +6,7 @@
  let state,mode='intro',current=null,lastDoor='BAKERY',pos=.09,target=null,held=0,lastTime=0,history=[],timer,transitioning=false;
  const reset=()=>{state={seen:false,visits:new Set(),choice:null,done:false};history=[];lastDoor='BAKERY';pos=.09;target=null;held=0;$('walker').style.transform='translateX(-50%) scaleX(1)';};reset();
  const asset=k=>data.assets[k];
- function background(k){$('scene').style.backgroundImage=`url("${asset(k)}")`;}
+ function background(k){if(window.MediaCache)return window.MediaCache.background($('scene'),asset(k));$('scene').style.backgroundImage=`url("${asset(k)}")`;}
  background('STREET');$('streetImg').src=asset('STREET');$('walker').src=asset('WALKER');$('walker').alt='查理的卡通小人物';
  function show(which){mode=which;window.GameAudio?.setMode(which);$('game').classList.toggle('is-story',which==='story');window.Opening?.setActive(which==='intro');['intro','street','story'].forEach(x=>$(x).hidden=x!==which);document.querySelector('.shade').style.background=which==='intro'?'linear-gradient(90deg,rgba(14,43,51,.86),rgba(14,43,51,.12) 85%)':which==='street'?'#1c4d5970':'linear-gradient(0deg,#183d4966,transparent 75%)';}
  function toast(t){$('toast').textContent=t;$('toast').style.display='block';clearTimeout(timer);timer=setTimeout(()=>$('toast').style.display='none',2400);}
@@ -20,7 +20,7 @@
   if(cast.dataset.character===name)return;
   cast.dataset.character=name;cast.replaceChildren();
   const slot=document.createElement('div');slot.className='portrait is-speaking';
-  const img=document.createElement('img');img.src=asset(name);img.alt=name;slot.append(img);cast.append(slot);
+  const img=document.createElement('img');img.decoding='async';img.src=asset(name);img.alt=name;slot.append(img);cast.append(slot);
  }
  function go(id){if(id==='STREET')return street();if(id.endsWith('-DONE')){const p=places.find(p=>id.startsWith(p.id+'-'));state.visits.add(p.key);toast('已经听过这份建议。现在可以回面包店作决定。');return street();}
   const r=rows[id];if(!r)throw new Error('未知节点 '+id);current=id;clearTimeout(timer);$('toast').style.display='none';show('story');background(r[2]);$('sceneLabel').textContent=labels[r[2]];$('speaker').textContent=r[4]==='系统'?'此刻的选择':r[4];$('line').textContent=r[5];$('choices').replaceChildren();$('next').hidden=false;renderCast(r);
@@ -41,7 +41,7 @@
    if(target!==null){if(Math.abs(target-pos)<.004){pos=target;target=null;}else dir=Math.sign(target-pos);}
    pos=Math.max(.035,Math.min(.97,pos+dir*dt*.15));moved=Math.abs(pos-before)>.000001;
    if(moved)$('walker').style.transform=`translateX(-50%) scaleX(${dir<0?-1:1})`;
-   position();
+   if(moved)position();
   }
   $('walker').classList.toggle('walking',moved);window.GameAudio?.walk(moved);
   requestAnimationFrame(frame);

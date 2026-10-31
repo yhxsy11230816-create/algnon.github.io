@@ -4,7 +4,7 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: #424b85 url('assets/opening-final-frame.png') center / cover no-repeat;
+  background: #424b85 url('assets/opening-final-frame.webp') center / cover no-repeat;
 }
 #openingVideo {
   display: block;

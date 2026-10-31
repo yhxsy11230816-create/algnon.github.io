@@ -20,7 +20,7 @@
   video.defaultMuted = true;
   video.loop = false;
   video.volume = 0.55;
-  if (reducedMotion.matches) video.poster = 'assets/opening-final-frame.png';
+  if (reducedMotion.matches) video.poster = 'assets/opening-final-frame.webp';
 
   function updateButtons() {
     playButton.textContent = failed ? '动画暂不可用' : video.ended ? '播放开场' : video.paused ? '播放开场' : '暂停开场';
