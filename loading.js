@@ -25,7 +25,7 @@
     }
   };
   const priority = ['STREET', 'WALKER', 'BAKERY', '查理'];
-  const queue = [...new Set([...priority.map(k => assets[k]), ...Object.values(assets)])];
+  const queue = [...new Set([...priority.map(k => assets[k]), ...Object.entries(assets).filter(([k]) => !k.includes('-')).map(([,v]) => v)])];
   async function worker() { while (queue.length) await load(queue.shift()); }
   worker(); worker();
 })();

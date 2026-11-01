@@ -4,10 +4,10 @@
  const places=[{id:'BAKERY',name:'面包店',x:.09,bg:'BAKERY'},{id:'ALICE',name:'夜校',x:.28,key:'alice',bg:'CLASSROOM'},{id:'PARK',name:'公园',x:.49,bg:'PARK'},{id:'DOCTOR',name:'咨询室',x:.75,key:'doctor',bg:'COUNSEL'},{id:'NEMUR',name:'实验室',x:.95,key:'nemur',bg:'LAB'}];
  const labels={STREET:'城市街道',BAKERY:'唐纳的面包店',CLASSROOM:'夜校',COUNSEL:'心理咨询室',LAB:'研究实验室',PARK:'公园',DOOR:'面包店门口'};
  let state,mode='intro',current=null,lastDoor='BAKERY',pos=.09,target=null,held=0,lastTime=0,history=[],timer,transitioning=false;
- const reset=()=>{state={seen:false,visits:new Set(),choice:null,done:false};history=[];lastDoor='BAKERY';pos=.09;target=null;held=0;$('walker').style.transform='translateX(-50%) scaleX(1)';};reset();
+ const reset=()=>{state={seen:false,visits:new Set(),choice:null,done:false};history=[];lastDoor='BAKERY';pos=.09;target=null;held=0;$('walker').style.transform='translateX(-50%)';$('walker').dataset.facing='right';};reset();
  const asset=k=>data.assets[k];
  function background(k){if(window.MediaCache)return window.MediaCache.background($('scene'),asset(k));$('scene').style.backgroundImage=`url("${asset(k)}")`;}
- background('STREET');$('streetImg').src=asset('STREET');$('walker').src=asset('WALKER');$('walker').alt='查理的卡通小人物';
+ background('STREET');$('streetImg').src=asset('STREET');$('walker').style.setProperty('--run-right',`url("${asset('RUN_RIGHT')}")`);$('walker').style.setProperty('--run-left',`url("${asset('RUN_LEFT')}")`);
  function show(which){mode=which;window.GameAudio?.setMode(which);$('game').classList.toggle('is-story',which==='story');window.Opening?.setActive(which==='intro');['intro','street','story'].forEach(x=>$(x).hidden=x!==which);document.querySelector('.shade').style.background=which==='intro'?'linear-gradient(90deg,rgba(14,43,51,.86),rgba(14,43,51,.12) 85%)':which==='street'?'#1c4d5970':'linear-gradient(0deg,#183d4966,transparent 75%)';}
  function toast(t){$('toast').textContent=t;$('toast').style.display='block';clearTimeout(timer);timer=setTimeout(()=>$('toast').style.display='none',2400);}
  function street(){show('street');background('STREET');current=null;target=null;held=0;pos=places.find(p=>p.id===lastDoor).x;$('taskText').textContent=!state.seen?'先去面包店看看。也可以沿街走走。':!state.visits.size?'找人谈谈吉姆比的事。夜校、咨询室、实验室都可以拜访。':'我听到了一些想法。可以继续咨询，也可以回面包店作决定。';$('doors').replaceChildren();places.forEach(p=>{let b=document.createElement('button');b.className='door';b.style.left=`${p.x*100}%`;b.innerHTML=`${p.name}<small>${p.key&&state.visits.has(p.key)?'已咨询 · 可以重看':'点击前往'}</small>`;b.onclick=()=>{if(Math.abs(pos-p.x)<.045)enter(p);else target=p.x;};b.dataset.place=p.id;$('doors').append(b);});position();}
@@ -15,12 +15,15 @@
  function enter(p){if(mode!=='street'||!p)return;lastDoor=p.id;target=null;held=0;if(p.id==='PARK')return go('PARK-01');if(p.id==='BAKERY')return go(!state.seen?'OBS-01':!state.visits.size?'LOCK-01':'DECIDE');go(!state.seen?`${p.id}-PRE-01`:state.visits.has(p.key)?`${p.id}-REVIEW-01`:`${p.id}-TALK-01`);}
  function choose(items){$('next').hidden=true;const box=$('choices');box.replaceChildren();items.forEach(([text,fn])=>{let b=document.createElement('button');b.textContent=text;b.onclick=()=>{if(transitioning)return;transitioning=true;fn();setTimeout(()=>transitioning=false,180);};box.append(b);});}
  function renderCast(r){
-  const name=['查理','吉姆比','唐纳','爱丽丝','斯特劳斯','尼姆教授'].find(n=>r[4].includes(n))||'查理';
+  const pose=data.portraits?.[r[0]];
+  const name=pose?.character||['查理','吉姆比','唐纳','爱丽丝','斯特劳斯','尼姆教授'].find(n=>r[4].includes(n))||'查理';
+  if(window.MediaCache){const group=r[0].replace(/-\d+$/,'');data.rows.filter(x=>x[0].startsWith(group+'-')).forEach(x=>{const p=data.portraits?.[x[0]];if(p)window.MediaCache.load(asset(p.key));});}
   const cast=$('cast');
-  if(cast.dataset.character===name)return;
-  cast.dataset.character=name;cast.replaceChildren();
+  const key=pose?.key||name;
+  if(cast.dataset.character===key)return;
+  cast.dataset.character=key;cast.replaceChildren();
   const slot=document.createElement('div');slot.className='portrait is-speaking';
-  const img=document.createElement('img');img.decoding='async';img.src=asset(name);img.alt=name;slot.append(img);cast.append(slot);
+  const img=document.createElement('img');img.decoding='async';img.src=asset(key)||asset(name);img.alt=name;slot.append(img);cast.append(slot);
  }
  function go(id){if(id==='STREET')return street();if(id.endsWith('-DONE')){const p=places.find(p=>id.startsWith(p.id+'-'));state.visits.add(p.key);toast('已经听过这份建议。现在可以回面包店作决定。');return street();}
   const r=rows[id];if(!r)throw new Error('未知节点 '+id);current=id;clearTimeout(timer);$('toast').style.display='none';show('story');background(r[2]);$('sceneLabel').textContent=labels[r[2]];$('speaker').textContent=r[4]==='系统'?'此刻的选择':r[4];$('line').textContent=r[5];$('choices').replaceChildren();$('next').hidden=false;renderCast(r);
@@ -40,7 +43,7 @@
    let dir=held;const before=pos;
    if(target!==null){if(Math.abs(target-pos)<.004){pos=target;target=null;}else dir=Math.sign(target-pos);}
    pos=Math.max(.035,Math.min(.97,pos+dir*dt*.15));moved=Math.abs(pos-before)>.000001;
-   if(moved)$('walker').style.transform=`translateX(-50%) scaleX(${dir<0?-1:1})`;
+   if(moved&&dir)$('walker').dataset.facing=dir<0?'left':'right';
    if(moved)position();
   }
   $('walker').classList.toggle('walking',moved);window.GameAudio?.walk(moved);

@@ -4,7 +4,6 @@
   const video = document.getElementById('openingVideo');
   const backdrop = document.getElementById('openingBackdrop');
   const controls = document.getElementById('openingControls');
-  const playButton = document.getElementById('openingPlay');
   const replayButton = document.getElementById('openingReplay');
   const soundButton = document.getElementById('openingSound');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -23,8 +22,6 @@
   if (reducedMotion.matches) video.poster = 'assets/opening-final-frame.webp';
 
   function updateButtons() {
-    playButton.textContent = failed ? '动画暂不可用' : video.ended ? '播放开场' : video.paused ? '播放开场' : '暂停开场';
-    playButton.disabled = failed;
     replayButton.disabled = failed;
     soundButton.disabled = failed;
     soundButton.textContent = video.muted ? '声音：关' : '声音：开';
@@ -40,7 +37,7 @@
       // A pending play promise must not restart media after entering the game.
       if (!active || leaving || blocked() || manualPause) video.pause();
     } catch {
-      // Autoplay can be denied on low-power devices; keep a working play button.
+      // Autoplay can be denied on low-power devices; keep the replay control available.
       playbackRequested = false;
     }
     updateButtons();
@@ -58,12 +55,6 @@
     updateButtons();
   }
 
-  playButton.addEventListener('click', () => {
-    if (video.ended) restart();
-    else if (video.paused) play();
-    else { manualPause = true; playbackRequested = false; video.pause(); }
-    updateButtons();
-  });
   replayButton.addEventListener('click', restart);
   soundButton.addEventListener('click', () => {
     video.muted = !video.muted;

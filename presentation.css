@@ -83,3 +83,9 @@
 @media (prefers-reduced-motion: reduce) {
   #scene, #game.is-story #cast .portrait { transition: none; animation: none; }
 }
+
+/* Two actual limb poses, not a translation of one still image. */
+#walker { width: auto; aspect-ratio: 3 / 4; background-image: var(--run-right); background-size: 400% 100%; background-position: 0 0; background-repeat: no-repeat; }
+#walker[data-facing="left"] { background-image: var(--run-left); }
+#walker.walking { animation: run-two .58s steps(1, end) infinite; }
+@keyframes run-two { 0%, 100% { background-position: 0 0; } 50% { background-position: 33.333333% 0; } }
